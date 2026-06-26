@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Product - TD Style</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+</head>
+<body class="bg-gray-50">
+  <div class="max-w-7xl mx-auto px-6 py-8">
+    <a href="index.html" class="text-pink-600 hover:underline mb-8 inline-block">← Back to Shop</a>
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-12">
+      <!-- Images -->
+      <div id="image-gallery" class="space-y-4"></div>
+
+      <!-- Details -->
+      <div>
+        <h1 id="product-name" class="text-4xl font-bold mb-4"></h1>
+        <p id="product-price" class="text-3xl text-pink-600 font-medium mb-6"></p>
+        
+        <p class="mb-2"><strong>Size:</strong> <span id="product-size"></span></p>
+        <p class="mb-6"><strong>Color:</strong> <span id="product-color"></span></p>
+        
+        <div class="mb-8">
+          <label class="block mb-2 font-medium">Quantity</label>
+          <div class="flex items-center gap-4">
+            <button onclick="changeQuantity(-1)" class="w-10 h-10 border rounded-xl text-2xl">-</button>
+            <span id="quantity" class="text-3xl font-semibold w-12 text-center">1</span>
+            <button onclick="changeQuantity(1)" class="w-10 h-10 border rounded-xl text-2xl">+</button>
+          </div>
+        </div>
+
+        <p id="product-desc" class="text-gray-600 mb-8 leading-relaxed"></p>
+        
+        <button onclick="addToCartFromDetail()" class="w-full bg-black text-white py-5 rounded-2xl text-xl hover:bg-pink-600">
+          Add to Cart
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const productId = urlParams.get('id');
+    const products = JSON.parse(localStorage.getItem('td_products')) || [];
+    const product = products.find(p => p.id == productId);
+    let quantity = 1;
+
+    if (product) {
+      document.getElementById('product-name').textContent = product.name;
+      document.getElementById('product-price').textContent = product.price + " LAK";
+      document.getElementById('product-size').textContent = product.size || 'Not specified';
+      document.getElementById('product-color').textContent = product.color || 'Not specified';
+      document.getElementById('product-desc').textContent = product.desc || "Beautiful fashion item from TD Style";
+
+      const gallery = document.getElementById('image-gallery');
+      const images = product.images && product.images.length ? product.images : [product.img || 'https://picsum.photos/id/180/400/300'];
+
+      images.forEach(img => {
+        const imgEl = document.createElement('img');
+        imgEl.src = img;
+        imgEl.className = "w-full rounded-3xl shadow cursor-pointer";
+        gallery.appendChild(imgEl);
+      });
+    } else {
+      document.body.innerHTML = "<h1 class='text-center py-20 text-2xl'>Product not found</h1>";
+    }
+
+    function changeQuantity(change) {
+      quantity = Math.max(1, quantity + change);
+      document.getElementById('quantity').textContent = quantity;
+    }
+
+    function addToCartFromDetail() {
+      if (product) {
+        let cart = JSON.parse(localStorage.getItem('td_cart')) || [];
+        for (let i = 0; i < quantity; i++) {
+          cart.push(product);
+        }
+        localStorage.setItem('td_cart', JSON.stringify(cart));
+        alert(quantity + " " + product.name + " added to cart!");
+        quantity = 1;
+        document.getElementById('quantity').textContent = 1;
+      }
+    }
+  </script>
+</body>
+</html>
